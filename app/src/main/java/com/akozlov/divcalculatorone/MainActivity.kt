@@ -82,7 +82,21 @@ fun DividerInput(divider: String) {
 
     Column() {
         Row() {
-
+            TextField(
+                value = phoneNumber,
+                onValueChange = {
+                    // Remove non-numeric characters.
+                    val stripped = numericRegex.replace(it, "")
+                    phoneNumber = if (stripped.length >= 10) {
+                        stripped.substring(0..9)
+                    } else {
+                        stripped
+                    }
+                },
+                label = { Text("Enter Phone Number") },
+//                visualTransformation = NanpVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
             Text ("Input Divider")
             }
 //
