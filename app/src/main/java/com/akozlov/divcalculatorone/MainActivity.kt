@@ -1,25 +1,22 @@
 package com.akozlov.divcalculatorone
 
-import android.R.attr.value
-import android.R.id.message
 import android.os.Bundle
-import android.renderscript.Sampler
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,11 +24,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.akozlov.divcalculatorone.ui.theme.DivCalculatorOneTheme
 
 class MainActivity : ComponentActivity() {
@@ -42,15 +37,9 @@ class MainActivity : ComponentActivity() {
             val div by remember{mutableStateOf("")}
             DivCalculatorOneTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Column() {
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                        DividerInput(div)
-                        DividendInput()
-                        CalculateButton()
-                        ResultPrintField()
+                    Column(modifier = Modifier.padding(20.dp)) {
+
+                        MainScreen()
                 }
                 }
             }
@@ -59,67 +48,102 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun MainScreen() {
+    // Состояние "поднято" сюда, чтобы все функции имели к нему доступ
+    var inputDivider by remember { mutableStateOf("") }
+    var inputDividend by remember { mutableStateOf("") }
+    val numericRegex = Regex("[^0-9]")
+    var resultText by remember { mutableStateOf("") }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        // Передаем значение и способ его изменить
+        DividerField(text = inputDivider,
+            {
+                // Remove non-numeric characters.
+                val stripped = numericRegex.replace(it, "")
+                inputDivider = if (stripped.length >= 10) {
+                    stripped.substring(0..9)
+                } else {
+                    stripped
+                }
+            }
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        DividendField(text = inputDividend,
+            {
+                // Remove non-numeric characters.
+                val stripped = numericRegex.replace(it, "")
+                inputDividend = if (stripped.length >= 10) {
+                    stripped.substring(0..9)
+                } else {
+                    stripped
+                }
+            }
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        var res = inputDivider + inputDividend
+        // Передаем действие при клике
+        CalculateButton(onClick = { resultText = res})
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Передаем текст для отображения
+        MyDisplayText(text = resultText)
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     DivCalculatorOneTheme {
-        Greeting("Android")
+
     }
 }
 
 @Composable
-fun DividerInput(divider: String) {
-
-    var phoneNumber by rememberSaveable { mutableStateOf("") }
-    val numericRegex = Regex("[^0-9]")
-
-    Column() {
-        Row() {
-            TextField(
-                value = phoneNumber,
-                onValueChange = {
-                    // Remove non-numeric characters.
-                    val stripped = numericRegex.replace(it, "")
-                    phoneNumber = if (stripped.length >= 10) {
-                        stripped.substring(0..9)
-                    } else {
-                        stripped
-                    }
-                },
-                label = { Text("Enter Phone Number") },
-//                visualTransformation = NanpVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
-            Text ("Input Divider")
-            }
-//
-        }
-    }
+fun DividerField(text: String, onValueChange: (String) -> Unit) {
+    TextField(
+        value = text,
+        onValueChange = onValueChange,
+        label = { Text("Введите Делимое") },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        modifier = Modifier.fillMaxWidth()
+    )
+}
 
 @Composable
-fun DividendInput() {
-    Column() {
-        Row() {
-            Text("Input Dividend")
-        }
+fun DividendField(text: String, onValueChange: (String) -> Unit) {
+    TextField(
+        value = text,
+        onValueChange = onValueChange,
+        label = { Text("Введите Делитель") },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+@Composable
+fun CalculateButton(onClick: () -> Unit) {
+    Button(onClick = onClick) {
+        Text("Показать результат")
     }
 }
 
 @Composable
-fun CalculateButton () {
-    Column() {
-        Row() {
-            Text("Calculate Button")
-        }
+fun MyDisplayText(text: String) {
+    if (text.isNotEmpty()) {
+        Text(text = "Вы ввели: $text", style = MaterialTheme.typography.bodyLarge)
     }
 }
+
+@Composable
+fun CalculationUnit(divider:String, dividend:String): String {
+    val res = (divider.toInt()/dividend.toInt()).toString()
+    return res
+}
+
 
 @Composable
 fun ResultPrintField() {
