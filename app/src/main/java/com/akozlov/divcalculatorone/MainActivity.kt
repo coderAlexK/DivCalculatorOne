@@ -92,7 +92,7 @@ fun MainScreen() {
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        val res = QuotentAsStrind(inputDividend, inputDivisor)
+        val res = quotentAsStrind(inputDividend, inputDivisor)
         // Передаем действие при клике
         CalculateButton(onClick = { resultText = res})
 
@@ -142,13 +142,13 @@ fun MyDisplayText(text: String) {
     }
 }
 
-fun QuotentAsStrind(divider:String, dividend:String): String {
+fun quotentAsStrind(divider:String, dividend:String): String {
     if (divider.isEmpty() or dividend.isEmpty()) return "0"
     val res = (divider.toDouble()/dividend.toDouble()).toString()
     return res
 }
 
-fun QuotentAsDouble(divider:String, dividend:String): Double {
+fun quotentAsDouble(divider:String, dividend:String): Double {
     if (divider.isEmpty() or dividend.isEmpty()) return 0.0
     val res = (divider.toDouble()/dividend.toDouble())
     return res
