@@ -36,11 +36,9 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             DivCalculatorOneTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Column(modifier = Modifier.padding(20.dp)) {
 
                         MainScreen()
-                }
                 }
             }
         }
@@ -84,7 +82,7 @@ fun MainScreen() {
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        var res = inputDivider + inputDividend
+        var res = CalculationUnit(inputDivider, inputDividend)
         // Передаем действие при клике
         CalculateButton(onClick = { resultText = res})
 
@@ -134,24 +132,18 @@ fun CalculateButton(onClick: () -> Unit) {
 @Composable
 fun MyDisplayText(text: String) {
     if (text.isNotEmpty()) {
-        Text(text = "Вы ввели: $text", style = MaterialTheme.typography.bodyLarge)
+        Text(text = "Частное: $text", style = MaterialTheme.typography.bodyLarge)
     }
 }
 
-@Composable
+
 fun CalculationUnit(divider:String, dividend:String): String {
+    if (divider.isEmpty() or dividend.isEmpty()) return "0"
     val res = (divider.toInt()/dividend.toInt()).toString()
     return res
 }
 
 
-@Composable
-fun ResultPrintField() {
-    Column() {
-        Row() {
-            Text("Result Field")
-        }
-    }
-}
+
 
 
