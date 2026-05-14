@@ -60,6 +60,7 @@ fun MainScreen() {
     var inputDividend by remember { mutableStateOf("") }
     var inputDivisor by remember { mutableStateOf("") }
     val numericRegex = Regex("[^0-9]")
+    val numericRegex2 = "^-?[0-9]*$".toRegex()
     var resultText by remember { mutableStateOf("") }
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -70,7 +71,9 @@ fun MainScreen() {
                 val stripped = numericRegex.replace(it, "")
                 inputDividend = if (stripped.length >= 10) {
                     stripped.substring(0..9)
-                } else {
+                } else if (!stripped.matches(numericRegex2)){
+                    stripped + "0000"
+                }  else {
                     stripped
                 }
             }
@@ -163,18 +166,14 @@ fun SquareUnit() {
         Row(modifier = Modifier.padding(top = 3.dp).fillMaxWidth().height(2.dp)
             ) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
-                   drawCircle(
-                       color = Color.Black,
-                       radius = size.minDimension / 1, // Размер точки
-                       center = center // Центрирование внутри Canvas
+                    drawCircle(
+                        color = Color.Black,
+                        radius = size.minDimension / 1, // Размер точки
+                        center = center // Центрирование внутри Canvas
 
-            )
-        }
-
-
-        }
-
-
+                    )
+                   }
+               }
         Row(modifier = Modifier.fillMaxWidth()
             ,verticalAlignment = Alignment.CenterVertically) {
 
@@ -188,6 +187,8 @@ fun SquareUnit() {
             color = Color.Black
         )
     }
-
 }
 
+fun ListFromRes(inputDividend: String, inputDivisor: String) {
+
+}
