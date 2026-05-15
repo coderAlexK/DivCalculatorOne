@@ -59,7 +59,7 @@ fun MainScreen() {
     // Состояние "поднято" сюда, чтобы все функции имели к нему доступ
     var inputDividend by remember { mutableStateOf("") }
     var inputDivisor by remember { mutableStateOf("") }
-    val numericRegex = Regex("[^0-9]")
+    val numericRegex = Regex("[^0-9-]")
     val numericRegex2 = "^-?[0-9]*$".toRegex()
     var resultText by remember { mutableStateOf("") }
 
@@ -69,10 +69,13 @@ fun MainScreen() {
             {
                 // Remove non-numeric characters.
                 val stripped = numericRegex.replace(it, "")
+                val firstDash = stripped.indexOf('-')
                 inputDividend = if (stripped.length >= 10) {
                     stripped.substring(0..9)
-                } else if (!stripped.matches(numericRegex2)){
-                    stripped + "0000"
+                } else if (firstDash != -1){
+
+                    stripped.take(firstDash + 1) + stripped.drop(firstDash + 1).replace("-", "")
+
                 }  else {
                     stripped
                 }
